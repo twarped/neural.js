@@ -3,7 +3,7 @@ const readline = require('node:readline').createInterface({
     output: process.stdout,
 });
 
-// Game it has to "learn" to play. I suck at this, and all this stuff is going to be from scratch, I really have no idea how this works.
+// Game it has to "learn" to play. I suck at this, and all this stuff is going to be from scratch, I really have no idea how to do any of this crap.
 
 const s1 = 1; // 01 (2-bits) scenario 1
 const s11 = 5 // 0101 (4-bits) scenario 1 sub scenario 1
