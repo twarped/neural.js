@@ -1,10 +1,38 @@
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home | toebrain.js</title>
+    <title>Tic Tac Toe | toebrain.js</title>
+    <link rel="stylesheet" href="/index.css">
 </head>
+
 <body>
-    
+
+    <h1>Tic Tac Toe</h1>
+
+    <p id="turn">Your Turn</p>
+    <div id="board-wrapper">
+        <div class="sidebar">
+            <span><p>You</p> <button id="you-symbol" onclick="switchPlayers()">X</button></span>
+            <divider>
+        </div>
+        <div id="board"></div>
+        <div class="sidebar">
+            <span><p>toebrain</p> <button id="toebrain-symbol" onclick="switchPlayers()">O</button></span>
+            <divider>
+        </div>
+    </div>
+    <button onclick="resetBoard()">Reset Board</button>
+
+    <div id="log-wrapper">
+        <h2>Log:</h2>
+        <div id="log"></div>
+    </div>
+
+    <script src="/index.js"></script>
+
 </body>
+
 </html>
