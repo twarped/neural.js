@@ -8,7 +8,7 @@ const handlers = {
         return new Response(Bun.file('views/index.html'));
     },
     'api/go': async (req = new Request()) => {
-        const response = await engine.go(await req.arrayBuffer()); // get go's response to the body as an array buffer
+        const response = await engine.go((await req.body.getReader().read()).value); // get go's response to the body as an array buffer
         return new Response(response, { headers: { 'Content-Type': 'application/json', 'accept': '*/*' } });
     }
 }
@@ -32,3 +32,5 @@ Bun.serve({
     },
     port: process.env.PORT || 3000
 })
+
+console.log(`Listening on port ${process.env.PORT || 3000}`);

@@ -1,4 +1,5 @@
 const board = document.getElementById('board');
+const gamesPlayed = document.getElementById('games-played');
 const turn = document.getElementById('turn');
 const youSymbol = document.getElementById('you-symbol');
 const toebrainSymbol = document.getElementById('toebrain-symbol');
@@ -18,6 +19,7 @@ const possesives = {
 let currentPlayer = true;
 let gameBoard = ['', '', '', '', '', '', '', '', ''];
 let gameActive = true;
+let games = 0;
 
 /**
  * Creates the game board by creating nine cells and adding them to the board element.
@@ -78,9 +80,13 @@ function cellClick(event) {
         gameBoard[index] = currentPlayer;
         event.target.textContent = symbols[currentPlayer];
         if (checkWinner()) {
+            games++;
+            gamesPlayed.textContent = 'Games Played: ' + games; // Increment the number of games played
             gameActive = false;
             turn.textContent = players[currentPlayer] + ` Win${players[currentPlayer] == 'toebrain' ? 's' : ''}!`;
         } else if (gameBoard.every(cell => cell !== '')) {
+            games++;
+            gamesPlayed.textContent = 'Games Played: ' + games; // Increment the number of games played
             gameActive = false;
             turn.textContent = 'Draw!';
         } else {
@@ -124,9 +130,7 @@ function go() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            data: gameBoard // Just 'data' because I want toebrain just to be able to recognize patterns, not be built for just tic tac toe. That would be lame.
-        })
+        body: JSON.stringify(gameBoard)
     })
 }
 
