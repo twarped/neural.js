@@ -1,7 +1,33 @@
+:root {
+    --input-left: 87px;
+}
+
+* {
+    box-sizing: border-box;
+    color: #333;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f4f4f4;
-    color: #333;
     text-align: center;
     display: flex;
     align-items: center;
@@ -29,7 +55,6 @@ h1 {
     height: 260px;
     border: 2px solid #ddd;
     border-radius: 5px;
-    box-sizing: border-box;
     background-color: #f1f1f1;
     margin: 10px;
     display: flex;
@@ -37,31 +62,62 @@ h1 {
     align-items: center;
 }
 
+.wide {
+    width: 260px;
+}
+
+.wider {
+    width: 390px;
+}
+
+.widest {
+    width: 520px;
+}
+
+@media screen and (max-width: 520px) {
+    .wide {
+        width: 100%;
+    }
+    
+    .wider {
+        width: 100%;
+    }
+    
+    .widest {
+        width: 100%;
+    }
+}
+
 span {
     width: 100%;
     padding: 10px;
-    box-sizing: border-box;
 }
 
 span > p {
     font-size: 16px;
     width: fit-content;
     float: left;
+    margin: 5px 0 0 5px;
+}
+
+.vertical-center {
     margin: 0;
-    margin-top: 5px;
-    margin-left: 5px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
 
 button {
+    display: block;
     width: 110px;
     height: 40px;
     border: 2px solid #ddd;
     background-color: #fff;
     border-radius: 5px;
-    box-sizing: border-box;
     margin: 10px;
     transition: background-color 0.3s ease;
-    color: #333;
     font-weight: bold;
 }
 
@@ -84,7 +140,24 @@ divider {
     margin: 0px;
     background-color: #ddd;
     border-radius: 5px;
+}
 
+input {
+    width: calc(100% - var(--input-left));
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    padding: 5px;
+}
+
+.right {
+    float: right;
+    margin-right: 5px;
+}
+
+.left {
+    float: left;
+    margin-left: 5px;
 }
 
 #board {
@@ -92,16 +165,22 @@ divider {
     grid-template-columns: repeat(3, 80px);
     grid-gap: 10px;
     grid-row-gap: 10px;
-    /* Explicitly set grid-row-gap to match grid-gap */
-    box-sizing: border-box;
     user-select: none;
-    /* Add this line to include padding and border in the element's total width and height */
 }
 
 p {
     font-size: 1.3em;
     margin: 10px;
     width: 260px;
+}
+
+#error-toast {
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+#error-toast.active {
+    opacity: 1;
 }
 
 .cell {
@@ -115,8 +194,6 @@ p {
     border: 2px solid #ddd;
     border-radius: 5px;
     transition: background-color 0.3s ease;
-    box-sizing: border-box;
-    /* Add this line to include padding and border in the element's total width and height */
 }
 
 .cell:hover {
@@ -136,14 +213,18 @@ h2 {
 }
 
 #log {
-    width: calc(100% - 24px);
-    height: calc(100% - 61px);
+    width: calc(100% - 20px);
+    height: calc(100% - 58px);
     border: 2px solid #ddd;
     border-radius: 5px;
     float: left;
-    margin-left: 10px;
-    margin-bottom: 10px;
+    margin: 10px;
+    margin-top: 0px;
     background-color: #fff;
     overflow-y: scroll;
     overflow-wrap: normal;
+    text-align: left;
+    font-weight: normal;
+    padding: 10px;
+    white-space: pre;
 }

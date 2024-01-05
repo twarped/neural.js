@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decimal To Binary | toebrain.js</title>
+    <link rel="stylesheet" href="/index.css">
+</head>
+<body>
+    <h1>Number Converter</h1>
+    <p id="error-toast">
+        <br><br>
+    </p>
+    <div id="board-wrapper" class="widest">
+        <div class="sidebar widest">
+            <span>
+                <p class="vertical-center left">Decimal</p>
+                <input type="text" id="decimal-input" placeholder="Decimal Input" class="right">
+            </span>
+            <divider></divider>
+            <span>
+                <p class="vertical-center left">Binary</p>
+                <input type="text" id="binary-input" placeholder="Binary Input" class="right">
+            </span>
+            <divider></divider>
+            <div class="vertical-center">
+                <button onclick="convertToBinary()">Convert to Binary</button>
+                <button onclick="convertToDecimal()">Convert to Decimal</button>
+            </div>
+        </div>
+    </div>
+    <p id="last-conversion">
+        <br><br>
+    </p>
+    <div id="log-wrapper">
+        <h2>Conversion Log</h2>
+        <div id="log"></div>
+    </div>
+
+    <script src="/dec-to-binary.js"></script>
+</body>
+</html>

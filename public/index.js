@@ -3,21 +3,25 @@ const gamesPlayed = document.getElementById('games-played');
 const turn = document.getElementById('turn');
 const youSymbol = document.getElementById('you-symbol');
 const toebrainSymbol = document.getElementById('toebrain-symbol');
+const log = document.getElementById('log');
+
 const symbols = {
-    true: 'X', // true is You
-    false: 'O', // false is toebrain
+    0: '',  // blank square
+    1: 'X', // true is You
+    2: 'O', // false is toebrain
+    3: '',  // blank square
 };
 const players = {
-    true: 'You', // true is You
-    false: 'toebrain', // false is toebrain
+    1: 'You', // true is You
+    2: 'toebrain', // false is toebrain
 };
 const possesives = {
-    true: 'Your', // true is You
-    false: 'toebrain\'s', // false is toebrain
+    1: 'Your', // true is You
+    2: 'toebrain\'s', // false is toebrain
 };
 
-let currentPlayer = true;
-let gameBoard = ['', '', '', '', '', '', '', '', ''];
+let currentPlayer = 1;
+let gameBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0]; // 
 let gameActive = true;
 let games = 0;
 
@@ -42,7 +46,7 @@ function createBoard() {
  * @memberof TicTacToe
  */
 function resetBoard() {
-    gameBoard = ['', '', '', '', '', '', '', '', ''];
+    gameBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0]; // Reset the game board to blank squares
     currentPlayer = Object.keys(symbols)[Object.values(symbols).indexOf('X')];
     gameActive = true;
     turn.textContent = possesives[currentPlayer] + ' Turn';
@@ -58,25 +62,25 @@ function resetBoard() {
  * @memberof TicTacToe
  */
 function switchPlayers() {
-    currentPlayer = !currentPlayer;
-    const lastYouSymbol = symbols[true]; // Store the symbol You last had
-    symbols[true] = symbols[false]; // true is You, false is toebrain
-    symbols[false] = lastYouSymbol;
+    currentPlayer = 1 ? 2 : 1;
+    const lastYouSymbol = symbols[1]; // Store the symbol You last had
+    symbols[1] = symbols[2]; // true is You, false is toebrain
+    symbols[2] = lastYouSymbol;
     turn.textContent = possesives[currentPlayer] + ' Turn'; // Update the turn text to show who's turn it is next since we're switching players
-    youSymbol.textContent = symbols[true];       // Switching the symbols on the board's
-    toebrainSymbol.textContent = symbols[false]; // sidebars to show who has what symbol
+    youSymbol.textContent = symbols[1];       // Switching the symbols on the board's
+    toebrainSymbol.textContent = symbols[2]; // sidebars to show who has what symbol
     go(); // Check if it's toebrain's turn now
 }
 
 /**
  * Event listener for when a cell is clicked.
  * 
- * @param {Event} event - The event object.
+ * @param {event} event - The event object.
  */
 function cellClick(event) {
     const index = event.target.getAttribute('data-index');
 
-    if (gameBoard[index] === '' && gameActive) {
+    if (!gameBoard[index] && gameActive) {
         gameBoard[index] = currentPlayer;
         event.target.textContent = symbols[currentPlayer];
         if (checkWinner()) {
@@ -84,13 +88,13 @@ function cellClick(event) {
             gamesPlayed.textContent = 'Games Played: ' + games; // Increment the number of games played
             gameActive = false;
             turn.textContent = players[currentPlayer] + ` Win${players[currentPlayer] == 'toebrain' ? 's' : ''}!`;
-        } else if (gameBoard.every(cell => cell !== '')) {
+        } else if (gameBoard.every(cell => cell > 0)) {
             games++;
             gamesPlayed.textContent = 'Games Played: ' + games; // Increment the number of games played
             gameActive = false;
             turn.textContent = 'Draw!';
         } else {
-            currentPlayer = !currentPlayer;
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
             turn.textContent = possesives[currentPlayer] + ' Turn';
         }
     }
@@ -112,7 +116,7 @@ function checkWinner() {
 
     return winPatterns.some(pattern => {
         const [a, b, c] = pattern;
-        return gameBoard[a] !== '' && gameBoard[a] === gameBoard[b] && gameBoard[b] === gameBoard[c];
+        return gameBoard[a] > 0 && gameBoard[a] === gameBoard[b] && gameBoard[b] === gameBoard[c];
     });
 }
 
@@ -122,15 +126,24 @@ function checkWinner() {
  * @memberof TicTacToe
  */
 function go() {
-    if (currentPlayer && gameActive) { // If currentPlayer is true, it's Your turn to move. If not, it's toebrain's turn
-        return false;
+    if (!gameActive) { // If currentPlayer is true, it's Your turn to move. If not, it's toebrain's turn
+        return;
     }
+
+    console.log(currentPlayer, gameActive);
+
+    let gameBitBoard = 0;
+    gameBoard.forEach(i => gameBitBoard = i | (gameBitBoard << 2));
+    console.log(gameBitBoard, gameBitBoard.toString(2));
     fetch('/api/go', { // We need to send the game board data to the server so it can go through toebrain's mind
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(gameBoard)
+    }).then(data => data.json()).then(data => {
+        console.log(data);
+        log.innerHTML += `<b>Input:</b> ${JSON.stringify(gameBoard)} <b>Output:</b> ${data}<br/>`;
     })
 }
 

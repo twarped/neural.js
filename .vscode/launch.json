@@ -9,7 +9,7 @@
             "internalConsoleOptions": "openOnSessionStart",
             "request": "launch",
             "name": "Debug File",
-            "program": "${file}",
+            "program": "app.js",
             "cwd": "${workspaceFolder}",
             "stopOnEntry": false,
             "watchMode": true
@@ -19,7 +19,7 @@
             "internalConsoleOptions": "neverOpen",
             "request": "launch",
             "name": "Run File",
-            "program": "${file}",
+            "program": "app.js",
             "cwd": "${workspaceFolder}",
             "noDebug": true,
             "watchMode": false

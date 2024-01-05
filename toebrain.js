@@ -1,4 +1,5 @@
-
+let model = Bun.file('model');
+let modelWriter = model.writer();
 
 /** 
  * gets The toebrain going and returns the response and process id
