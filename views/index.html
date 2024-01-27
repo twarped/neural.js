@@ -15,20 +15,25 @@
     <p id="turn">Your Turn</p>
     <div id="board-wrapper">
         <div class="sidebar">
-            <span><p>You</p> <button id="you-symbol" onclick="switchPlayers()">X</button></span>
+            <span><p>You</p> <button id="you-symbol" onclick="switchSymbols()">X</button></span>
             <divider>
+            <span><p>Wins</p> <p class="you-wins">0</p></span>
         </div>
         <div id="board"></div>
         <div class="sidebar">
-            <span><p>toebrain</p> <button id="toebrain-symbol" onclick="switchPlayers()">O</button></span>
+            <span><p>toebrain</p> <button id="toebrain-symbol" onclick="switchSymbols()">O</button></span>
             <divider>
+            <span><p>Wins</p> <p class="toebrain-wins">0</p></span>
         </div>
     </div>
     <p id="games-played">Games Played: 0</p>
     <button onclick="resetBoard()">Reset Board</button>
 
     <div id="log-wrapper">
-        <h2>Log:</h2>
+        <div>
+            <h2>Log: </h2>
+            <button id="clear-log" onclick="clearLog()">Clear</button>
+        </div>
         <div id="log"></div>
     </div>
 

@@ -10,9 +10,14 @@ const handlers = {
     'dec-to-binary': req => {
         return new Response(Bun.file('views/dec-to-binary.html'));
     },
-    'api/go': async (req = new Request()) => {
-        const response = await engine.go((await req.body.getReader().read()).value); // get go's response to the body as an array buffer
-        return new Response(response, { headers: { 'Content-Type': 'application/json', 'accept': '*/*' } });
+    'api/go': 
+    /**
+     * @param {Response} req the client request
+     * @returns {Response} toebrain's response
+     */
+    async req => {
+        const dataStream = engine.go((await req.body.getReader().read()).value); // get toebrain's response to the body as a readable stream
+        return new Response(dataStream, { 'Content-Type': 'application/octet-stream', 'Transfer-Encoding': 'chunked' });
     }
 }
 

@@ -1,5 +1,5 @@
 {
-  "name": "neural.js",
+  "name": "toebrain.js",
   "module": "app.js",
   "devDependencies": {
     "@types/bun": "latest"
@@ -9,6 +9,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@types/node": "^20.11.5",
     "fs": "^0.0.1-security"
   }
 }
