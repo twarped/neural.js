@@ -5,6 +5,7 @@ const youSymbol = document.getElementById('you-symbol');
 const toebrainSymbol = document.getElementById('toebrain-symbol');
 const log = document.getElementById('log');
 
+const symbolFirst = 'X'; // X usually goes first... but in case it doesn't
 const symbols = {
     0: '',  // blank square
     1: 'X', // 1 is You
@@ -67,7 +68,7 @@ function resetBoard() {
         const cell = board.children[i];
         cell.textContent = '';
     }
-    currentPlayer = Object.keys(symbols)[Object.values(symbols).indexOf('X')]; // This is how I find who uses the symbol 'X'. X always goes first.
+    currentPlayer = parseInt(Object.keys(symbols)[Object.values(symbols).indexOf(symbolFirst)]); // This is how I find who uses the symbolFirst...
     gameActive = true;
     turn.textContent = possesives[currentPlayer] + ' Turn';
 }

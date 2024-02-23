@@ -8,8 +8,9 @@ let modelWriter = model.writer();
  * @returns {ReadableStream} Promise of the response and process id
 */
 function go(data) {
+    console.log(data);
     return new ReadableStream({ // Tried a PassThrough stream here, it didn't work because of a double-wrapped ReadableStream
-        async start(controller) {
+        async start(controller) { // I'm not currently sending chunked data... so I'll worry about this later.
             controller.enqueue(data);
             controller.close();
         }
