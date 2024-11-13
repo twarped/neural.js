@@ -11,12 +11,22 @@ let model = Bun.file('model');
  * @returns {{ processId: number, stream: ReadableStream }} Promise of the response and process id
 */
 function go(data) {
-    return new ReadableStream({ // Tried a PassThrough stream here, it didn't work because of a double-wrapped ReadableStream
-        async start(controller) {
-            controller.enqueue(data);
-            controller.close();
-        }
-    });
+    return {
+        processId: 1, // Placeholder for the process id
+        stream: new ReadableStream({ // Tried a PassThrough stream here, it didn't work because of a double-wrapped ReadableStream
+            async start(controller) {
+                console.log('data', data);
+                let response = [];
+                for (let i in data) {
+                    response.push(Math.floor(Math.random() * 4));
+                }
+                response = new Uint8Array(response);
+                console.log('response', response);
+                controller.enqueue(response);
+                controller.close();
+            }
+        })
+    }
 }
 
 /** 
