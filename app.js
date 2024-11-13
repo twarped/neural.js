@@ -1,3 +1,4 @@
+import { stdin, stdout } from 'process';
 import engine from './toebrain';
 
 const handlers = {
@@ -10,18 +11,19 @@ const handlers = {
     'dec-to-binary': req => {
         return new Response(Bun.file('views/dec-to-binary.html'));
     },
-    'api/go': 
-    /**
-     * @param {Response} req the client request
-     * @returns {Response} toebrain's response
-     */
-    async req => {
-        const dataStream = engine.go((await req.body.getReader().read()).value); // get toebrain's response to the body as a readable stream
-        return new Response(dataStream, { 'Content-Type': 'application/octet-stream', 'Transfer-Encoding': 'chunked' });
-    }
+    'api/go':
+        /**
+         * @param {Response} req the client request
+         * @returns {Response} toebrain's response
+         */
+        async req => {
+            /**
+             * @constant {{ processId: number, stream: ReadableStream }} Promise of the response and process id
+             */
+            const data = engine.go((await req.body.getReader().read()).value); // get toebrain's response to the body as a readable stream
+            return new Response(data.stream, { 'Content-Type': 'application/octet-stream', 'Transfer-Encoding': 'chunked', headers: { 'process-id': data.processId } });
+        }
 }
-
-
 
 Bun.serve({
     async fetch(req) { // Request handler function to dish out requests
@@ -34,7 +36,7 @@ Bun.serve({
 
         const exists = await handler.exists(); // Since the handler was not found, we'll check if it exists in the public folder
         if (exists)
-            return new Response(handler, {status: 200}); // It exists, return the file
+            return new Response(handler, { status: 200 }); // It exists, return the file
 
         return handlers['404'](); // Nothing was found, return 404
     },
@@ -42,3 +44,10 @@ Bun.serve({
 })
 
 console.log(`Listening on port ${process.env.PORT || 3000}`);
+
+stdin.addListener('data', async () => { console.log(((await engine.random(9)).map(byte => { return byte * 3 / 256 }))) })
+// const filteredBytes = bytes.filter(byte => { return byte < 2 });
+// console.log(filteredBytes);
+// console.log(filteredBytes.map(byte => {
+//     console.log('byte:', byte / 256);
+// }));

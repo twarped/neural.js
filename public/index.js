@@ -29,10 +29,10 @@ const playerWins = {
     1: 0, // 1 is You
     2: 0  // 2 is toebrain
 };
-const playerLossesTrackers = {
-    1: document.getElementById('you-losses'),     // 1 is You
-    2: document.getElementById('toebrain-losses') // 2 is toebrain
-};
+// const playerLossesTrackers = {
+//     1: document.getElementById('you-losses'),     // 1 is You
+//     2: document.getElementById('toebrain-losses') // 2 is toebrain
+// };
 const playerLosses = {
     1: 0, // 1 is You
     2: 0  // 2 is toebrain
@@ -55,7 +55,9 @@ function createBoard() {
         board.appendChild(cell);
     }
 
-    go(); // Start the game by checking if it's toebrain's turn
+    if (currentPlayer === 2) { // Check if it's toebrain's turn
+        go(); // Start the game
+    }
 }
 
 /**
@@ -71,6 +73,13 @@ function resetBoard() {
     currentPlayer = parseInt(Object.keys(symbols)[Object.values(symbols).indexOf(symbolFirst)]); // This is how I find who uses the symbolFirst...
     gameActive = true;
     turn.textContent = possesives[currentPlayer] + ' Turn';
+
+    console.log('currentPlayer:', currentPlayer);
+    console.log('symbols:', symbols);
+    console.log('playerNames:', playerNames);
+    console.log('possesives:', possesives);
+    console.log('playerWins:', playerWins);
+    console.log('playerLosses:', playerLosses);
 }
 
 /**
@@ -96,9 +105,7 @@ function switchSymbols() {
 function cellClick(event) {
     console.log('cellClick');
     const i = event.target.getAttribute('data-index');
-
-    console.log('gameBoard', gameBoard);
-    console.log('i', i);
+    console.log(currentPlayer);
 
     if (!gameBoard[i] && gameActive) {
         gameBoard[i] = currentPlayer;
@@ -108,8 +115,10 @@ function cellClick(event) {
             gamesPlayedText.textContent = 'Games Played: ' + gamesPlayed; // Increment the number of games played
             gameActive = false;
             turn.textContent = playerNames[currentPlayer] + ` Win${playerNames[currentPlayer] == 'toebrain' ? 's' : ''}!`;
-            playerWins[currentPlayer]++;
-
+            playerWins[currentPlayer]++; // Increment the number of wins for the current player
+            playerLosses[currentPlayer === 2 ? 1 : 2]++; // Increment the number of losses for the other player
+            playerWinsTrackers[currentPlayer].textContent = playerWins[currentPlayer]; // Update the win counter
+            // playerLossesTrackers[currentPlayer === 2 ? 1 : 2].textContent = playerLosses[currentPlayer === 2 ? 1 : 2]; // Update the loss counter
         } else if (gameBoard.every(cell => cell > 0)) {
             gamesPlayed++;
             gamesPlayedText.textContent = 'Games Played: ' + gamesPlayed; // Increment the number of games played
@@ -117,11 +126,13 @@ function cellClick(event) {
             turn.textContent = 'Draw!';
         } else {
             currentPlayer = currentPlayer === 1 ? 2 : 1;
-            turn.textContent = possesives[currentPlayer] +' Turn'; // Update the turn textContent
+            turn.textContent = possesives[currentPlayer] + ' Turn'; // Update the turn textContent
         }
+        go(); // Check if it's toebrain's turn now
     }
 
-    go(); // Check if it's toebrain's turn now
+    console.log('gameBoard', gameBoard);
+    console.log('i', i);
 }
 
 /**
@@ -187,9 +198,9 @@ function arrayToInt(arr) {
  * @memberof TicTacToe
  */
 function go() {
-    if (!gameActive) { // If game isn't active, don't send the game data to toebrain
-        return;
-    }
+    // if (!gameActive) { // If game isn't active, don't send the game data to toebrain
+    //     return;
+    // }
 
     let gameBitBoard = arrayToInt(gameBoard); // Convert the game board array to a bitboard integer;\
     const gameBitBoardString = decToBinary(gameBitBoard, 18); // Convert the bitboard integer to a string
@@ -199,26 +210,30 @@ function go() {
             'Content-Type': 'application/octet-stream',
         },
         body: new Uint8Array(gameBoard), // Just send the bitboard for now.
-    }).then(async data => { 
-        return { 
-            status: data.status, 
-            statusText: data.statusText, 
+    }).then(async data => {
+        return {
+            status: data.status,
+            statusText: data.statusText,
+            headers: data.headers,
             body: data.body
-        }; 
+        };
     }).then(
         /**
          * 
-         * @param {{status: number, statusText: string, body: ReadableStream}} data The data returned from our POST to toebrain
+         * @param {{status: number, statusText: string, headers: Headers, body: ReadableStream}} data The data returned from our POST to toebrain
          */
         async data => {
             const response = (await data.body.getReader().read()).value;
+            const processId = data.headers.get('process-id');
+
+            console.log(response);
             const newTurnWrapper = document.createElement('div');
             newTurnWrapper.classList.add('turn-wrapper');
             newTurnWrapper.innerHTML += `<div class="input-wrapper"><p>Input:</p><divider></divider><div class="ellipsis">Uint8Array [${gameBoard}]</div><br><div class="ellipsis">${gameBitBoardString}: ${gameBitBoard}</div></div><div class="output-wrapper"><p>Output:</p><divider></divider><div class="ellipsis">Uint8Array [${response}]</div><br><div class="ellipsis">${decToBinary(arrayToInt(response), 18)}: ${arrayToInt(response)}</div></div>`; // Parse everything into an easy to read format
             log.appendChild(newTurnWrapper);
             if (log.scrollTop + newTurnWrapper.offsetHeight >= log.scrollHeight - log.offsetHeight - 27 - 60) {
                 log.scrollTo({
-                    top: log.scrollHeight - log.offsetHeight - 27,
+                    top: log.scrollHeight - log.offsetHeight + 2,
                     behavior: 'smooth'
                 });
             }

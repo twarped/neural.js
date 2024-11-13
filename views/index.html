@@ -12,22 +12,26 @@
 
     <h1>Tic Tac Toe</h1>
 
-    <p id="turn">Your Turn</p>
-    <div id="board-wrapper">
-        <div class="sidebar">
-            <span><p>You</p> <button id="you-symbol" onclick="switchSymbols()">X</button></span>
-            <divider>
-            <span><p>Wins</p> <p class="you-wins">0</p></span>
+    <div id="game-wrapper">
+        <p id="turn">Your Turn</p>
+        <div id="board-wrapper">
+            <div class="sidebar">
+                <span><p>You</p> <button id="you-symbol" onclick="switchSymbols()">X</button></span>
+                <divider>
+                <span><p>Wins:</p> <p id="you-wins">0</p></span>
+                <!-- <span><p>Losses:</p> <p id="you-losses">0</p></span> -->
+            </div>
+            <div id="board"></div>
+            <div class="sidebar">
+                <span><p>toebrain</p> <button id="toebrain-symbol" onclick="switchSymbols()">O</button></span>
+                <divider>
+                <span><p>Wins:</p> <p id="toebrain-wins">0</p></span>
+                <!-- <span><p>Losses:</p> <p id="toebrain-losses">0</p></span> -->
+            </div>
         </div>
-        <div id="board"></div>
-        <div class="sidebar">
-            <span><p>toebrain</p> <button id="toebrain-symbol" onclick="switchSymbols()">O</button></span>
-            <divider>
-            <span><p>Wins</p> <p class="toebrain-wins">0</p></span>
-        </div>
+        <p id="games-played">Games Played: 0</p>
+        <button onclick="resetBoard()">Reset Board</button>
     </div>
-    <p id="games-played">Games Played: 0</p>
-    <button onclick="resetBoard()">Reset Board</button>
 
     <div id="log-wrapper">
         <div>
