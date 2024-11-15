@@ -17,10 +17,12 @@ const handlers = {
          * @returns {Response} toebrain's response
          */
         async req => {
+            const body = (await req.body.getReader().read()).value;
+            console.log('body', body);
             /**
              * @constant {{ processId: number, stream: ReadableStream }} Promise of the response and process id
              */
-            const data = engine.go((await req.body.getReader().read()).value); // get toebrain's response to the body as a readable stream
+            const data = engine.go(body); // get toebrain's response to the body as a readable stream
             return new Response(data.stream, { 'Content-Type': 'application/octet-stream', 'Transfer-Encoding': 'chunked', headers: { 'process-id': data.processId } });
         }
 }
@@ -44,10 +46,3 @@ Bun.serve({
 })
 
 console.log(`Listening on port ${process.env.PORT || 3000}`);
-
-stdin.addListener('data', async () => { console.log(((await engine.random(9)).map(byte => { return byte * 3 / 256 }))) })
-// const filteredBytes = bytes.filter(byte => { return byte < 2 });
-// console.log(filteredBytes);
-// console.log(filteredBytes.map(byte => {
-//     console.log('byte:', byte / 256);
-// }));

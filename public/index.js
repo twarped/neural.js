@@ -73,13 +73,6 @@ function resetBoard() {
     currentPlayer = parseInt(Object.keys(symbols)[Object.values(symbols).indexOf(symbolFirst)]); // This is how I find who uses the symbolFirst...
     gameActive = true;
     turn.textContent = possesives[currentPlayer] + ' Turn';
-
-    console.log('currentPlayer:', currentPlayer);
-    console.log('symbols:', symbols);
-    console.log('playerNames:', playerNames);
-    console.log('possesives:', possesives);
-    console.log('playerWins:', playerWins);
-    console.log('playerLosses:', playerLosses);
 }
 
 /**
@@ -103,9 +96,7 @@ function switchSymbols() {
  * @param {event} event - The event object.
  */
 function cellClick(event) {
-    console.log('cellClick');
     const i = event.target.getAttribute('data-index');
-    console.log(currentPlayer);
 
     if (!gameBoard[i] && gameActive) {
         gameBoard[i] = currentPlayer;
@@ -130,9 +121,6 @@ function cellClick(event) {
         }
         go(); // Check if it's toebrain's turn now
     }
-
-    console.log('gameBoard', gameBoard);
-    console.log('i', i);
 }
 
 /**
@@ -184,7 +172,7 @@ function decToBinary(num, bitLength) {
  * Cool equation that splices together an array of integers into a single integer.
  * 
  * @param {Array} arr the array of integers to splice together into a single integer.
- * @returns 
+ * @returns {number} the spliced integer.
  */
 function arrayToInt(arr) {
     let int = 0;
@@ -193,23 +181,32 @@ function arrayToInt(arr) {
 }
 
 /**
+ * Is the new bitboard/move legal? 
+ * 
+ * @param {number} newBitBoard The bitboard to be checked
+ * @param {number} bitBoard The bitboard to be checked against. Defaults to `arrayToInt(gameBoard)`
+ */
+function legalBitBoard(newBitBoard, bitBoard = arrayToInt(gameBoard)) {
+    
+}
+
+/**
  * Sends the game board data to the server to be processed by toebrain.
  * 
  * @memberof TicTacToe
  */
 function go() {
-    // if (!gameActive) { // If game isn't active, don't send the game data to toebrain
-    //     return;
-    // }
-
-    let gameBitBoard = arrayToInt(gameBoard); // Convert the game board array to a bitboard integer;\
+    let gameBitBoard = arrayToInt(gameBoard); // Convert the game board array to a bitboard integer
+    let buffer = new ArrayBuffer(4); // 18 bits / 1 byte = 2 bytes remainder 2 bits. So 4 bytes total
+    let bitBoardBuffer = new DataView(buffer);
+    bitBoardBuffer.setUint32(0, gameBitBoard, false); // Put the number in the buffer
     const gameBitBoardString = decToBinary(gameBitBoard, 18); // Convert the bitboard integer to a string
     fetch('/api/go', { // We need to send the game board data to the server so it can go through toebrain's mind
         method: 'POST',
         headers: {
             'Content-Type': 'application/octet-stream',
         },
-        body: new Uint8Array(gameBoard), // Just send the bitboard for now.
+        body: bitBoardBuffer, // Just send the bitboard for now.
     }).then(async data => {
         return {
             status: data.status,
@@ -220,16 +217,17 @@ function go() {
     }).then(
         /**
          * 
-         * @param {{status: number, statusText: string, headers: Headers, body: ReadableStream}} data The data returned from our POST to toebrain
+         * @param {{status: number, statusText: string, headers: Headers, body: ReadableStream<Uint8Array>}} data The data returned from our POST to toebrain
          */
         async data => {
-            const response = (await data.body.getReader().read()).value;
             const processId = data.headers.get('process-id');
 
-            console.log(response);
+            const response = (await data.body.getReader().read()).value;
+            let responseInt = new DataView(response.buffer).getUint32(0); // Convert from bytes to a easily-human readable number
+
             const newTurnWrapper = document.createElement('div');
             newTurnWrapper.classList.add('turn-wrapper');
-            newTurnWrapper.innerHTML += `<div class="input-wrapper"><p>Input:</p><divider></divider><div class="ellipsis">Uint8Array [${gameBoard}]</div><br><div class="ellipsis">${gameBitBoardString}: ${gameBitBoard}</div></div><div class="output-wrapper"><p>Output:</p><divider></divider><div class="ellipsis">Uint8Array [${response}]</div><br><div class="ellipsis">${decToBinary(arrayToInt(response), 18)}: ${arrayToInt(response)}</div></div>`; // Parse everything into an easy to read format
+            newTurnWrapper.innerHTML += `<div class="input-wrapper"><p>Input:</p><divider></divider><div class="ellipsis">ArrayBuffer [${new Uint8Array(bitBoardBuffer.buffer)}]</div><br><div class="ellipsis">${gameBitBoardString}: ${gameBitBoard}</div></div><div class="output-wrapper"><p>Output:</p><divider></divider><div class="ellipsis">Uint8Array [${response}]</div><br><div class="ellipsis">${decToBinary(responseInt, 18)}: ${responseInt}</div></div>`; // Parse everything into an easy to read format
             log.appendChild(newTurnWrapper);
             if (log.scrollTop + newTurnWrapper.offsetHeight >= log.scrollHeight - log.offsetHeight - 27 - 60) {
                 log.scrollTo({

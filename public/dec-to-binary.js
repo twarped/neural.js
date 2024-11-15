@@ -40,7 +40,7 @@ function convertToDecimal() {
 }
 
 function logConversion(type, input, result) {
-    const stringToPrint = `${type}: ${input} -> ${result}\n`;
+    const stringToPrint = `${type}: ${input} -> ${result}`;
     console.log(stringToPrint)
-    log.textContent += stringToPrint;
+    log.innerHTML += '<br>' + stringToPrint;
 }

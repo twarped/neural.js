@@ -1,29 +1,25 @@
-import { spawn } from "bun";
-import { exec } from "child_process";
-import { randomBytes } from "crypto";
-import { StringDecoder } from "string_decoder";
-
 let model = Bun.file('model');
 
 /** 
  * gets The toebrain going and returns the response and process id
- * @param {Uint8Array} data Has to be an Uint8Array, because I want it to be binary data
+ * @param {Uint8Array} res Has to be an Uint8Array, because I want it to be binary data
  * @returns {{ processId: number, stream: ReadableStream }} Promise of the response and process id
 */
-function go(data) {
+function go(res) {
+    const data = new Uint8Array(res.length); // Set the response buffer to the actual length of the response
+    data.set(res);
+
     return {
         processId: 1, // Placeholder for the process id
-        stream: new ReadableStream({ // Tried a PassThrough stream here, it didn't work because of a double-wrapped ReadableStream
+        stream: new ReadableStream({
             async start(controller) {
-                console.log('data', data);
-                let response = [];
-                for (let i in data) {
-                    response.push(Math.floor(Math.random() * 4));
-                }
-                response = new Uint8Array(response);
+                const dataView = new DataView(data.buffer);
+                console.log(dataView);
+                console.log(dataView.getUint32());
+                const response = await random(4);
                 console.log('response', response);
-                controller.enqueue(response);
-                controller.close();
+                controller.enqueue(response); // Send the response through the stream
+                controller.close(); // Close the stream
             }
         })
     }
@@ -37,8 +33,6 @@ function go(data) {
 function giveFeedback(processId, fitness) {
 
 }
-
-randomBytes
 
 /**
  * Returns an amount of random bytes taken from /dev/random or /dev/urandom
@@ -75,9 +69,9 @@ function random(bytes = 1, random = false) {
             bytesRead += Math.min(chunk.length, remaining);
             if (bytesRead >= 1) break; // Stop once x bytes are collected
         }
-        
+
         await process.exited; // Just to make sure that Bun stops looking at stdout
-        
+
         resolve(collectedBytes); // Resolve the random bytes collected from /dev/(u)random
     });
 }
