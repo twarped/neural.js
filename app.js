@@ -18,7 +18,6 @@ const handlers = {
          */
         async req => {
             const body = (await req.body.getReader().read()).value;
-            console.log('body', body);
             /**
              * @constant {{ processId: number, stream: ReadableStream }} Promise of the response and process id
              */

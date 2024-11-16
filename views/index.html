@@ -13,6 +13,11 @@
     <h1>Tic Tac Toe</h1>
 
     <div id="game-wrapper">
+        <div id="load-board-wrapper">
+            <p>Load&nbsp;Board:</p>
+            <input type="text" id="loadBoard" placeholder="e.g. 4480">
+            <button onclick="loadBoard(parseInt(document.getElementById('loadBoard').value))">Load</button>
+        </div>
         <p id="turn">Your Turn</p>
         <div id="board-wrapper">
             <div class="sidebar">

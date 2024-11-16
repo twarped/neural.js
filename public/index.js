@@ -43,6 +43,13 @@ let gameBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0]; //
 let gameActive = true;
 let gamesPlayed = 0;
 
+function gameLog(text, header = 'Log Entry') {
+    const newLogWrapper = document.createElement('div');
+    newLogWrapper.classList.add('turn-wrapper');
+    newLogWrapper.innerHTML = `<p>${header}:</p><divider></divider><div>${text}</div>`;
+    log.appendChild(newLogWrapper);
+}
+
 /**
  * Creates the game board by creating nine cells and adding them to the board element.
  */
@@ -58,6 +65,30 @@ function createBoard() {
     if (currentPlayer === 2) { // Check if it's toebrain's turn
         go(); // Start the game
     }
+}
+
+/**
+ * 
+ * @param {number} bitBoard The board to load into the game
+ */
+function loadBoard(bitBoard) {
+    let bitBoardString = bitBoard.toString(2);
+    if (bitBoardString.length % 2 === 1) {
+        bitBoardString = '0' + bitBoardString; // Add a leading zero if the string length is odd
+    }
+
+    let bitBoardArray = bitBoardString.match(/.{1,2}/g).map(bit => {
+        return parseInt(bit, 2);
+    });
+    bitBoardArray.unshift(...Array(9 - gameBoard.length).fill(0));
+
+    gameBoard = bitBoardArray;
+
+    for (i in bitBoardArray.slice(0, 8)) {
+        const cell = board.children[i];
+        cell.textContent = symbols[bitBoardArray[i]];
+    };
+    gameLog(`bitBoard: ${bitBoard}<br><br>bitBoardString: ${bitBoardString}<br><br>bitBoardArray: ${bitBoardArray}`, 'Board loaded')
 }
 
 /**
@@ -181,13 +212,52 @@ function arrayToInt(arr) {
 }
 
 /**
- * Is the new bitboard/move legal? 
+ * Is the bitboard a legal tictactoe board? 
  * 
- * @param {number} newBitBoard The bitboard to be checked
- * @param {number} bitBoard The bitboard to be checked against. Defaults to `arrayToInt(gameBoard)`
+ * @param {number} bitBoard The bitboard to be checked
  */
-function legalBitBoard(newBitBoard, bitBoard = arrayToInt(gameBoard)) {
+function legalBitBoard(bitBoard) {
     
+}
+
+/**
+ * Is the new move/bitboard legal?
+ * 
+ * @param {number} newBitBoard The bitboard/move to be checked
+ * @param {number} firstMove Is X (1) or O (2) going first on this board
+ * @param {number} bitBoard The bitboard to have the move checked against
+ */
+// newBitBoard = 4512
+function legalMove(newBitBoard = 156674, firstMove = parseInt(Object.keys(symbols)[Object.values(symbols).indexOf(symbolFirst)]), bitBoard = 156672) {
+    console.log('current board:', bitBoard, bitBoard.toString(2));
+    console.log('new board/move:', newBitBoard, newBitBoard.toString(2));
+    
+    // Check if the new board is the same as the current board
+    if (bitBoard === newBitBoard) {
+        console.log('nope. same board!');
+        return false;
+    }
+
+    // Does the move resemble the board?
+    if (bitBoard | newBitBoard === newBitBoard) { // It at least resembles the board
+        console.log(bitBoard | newBitBoard, '===', newBitBoard);
+
+        // Check if only one bit is left after XORing the board and the new board
+        let move = bitBoard ^ newBitBoard;
+        let remainder = Math.log2(move);
+        if (remainder - Math.floor(remainder) === 0) {
+            // console.log(remainder / 2, remainder % 2);
+            let d = 1024;
+            console.log(bitBoard.toString(2));
+            console.log('eq', bitBoard, '/', d, ':', bitBoard / d, bitBoard % d);
+        } else {
+            console.log('proposed more than one move or an invalid symbol representation');
+            return false;
+        }
+    } else { // The move doesn't even resemble the board
+        console.log('nope!', bitBoard | newBitBoard, '!==', newBitBoard);
+        return false;
+    }
 }
 
 /**
@@ -224,6 +294,8 @@ function go() {
 
             const response = (await data.body.getReader().read()).value;
             let responseInt = new DataView(response.buffer).getUint32(0); // Convert from bytes to a easily-human readable number
+
+            console.log(legalMove()); // Check if the response is a legal move
 
             const newTurnWrapper = document.createElement('div');
             newTurnWrapper.classList.add('turn-wrapper');

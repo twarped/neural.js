@@ -5,19 +5,19 @@ let model = Bun.file('model');
  * @param {Uint8Array} res Has to be an Uint8Array, because I want it to be binary data
  * @returns {{ processId: number, stream: ReadableStream }} Promise of the response and process id
 */
-function go(res) {
-    const data = new Uint8Array(res.length); // Set the response buffer to the actual length of the response
-    data.set(res);
+function go(body) {
+    const data = new Uint8Array(body.length); // Set the response buffer to the actual length of the response
+    data.set(body);
 
     return {
         processId: 1, // Placeholder for the process id
         stream: new ReadableStream({
             async start(controller) {
                 const dataView = new DataView(data.buffer);
-                console.log(dataView);
-                console.log(dataView.getUint32());
                 const response = await random(4);
-                console.log('response', response);
+                console.log('body', dataView.getUint32());
+                console.log('response', new DataView(response.buffer).getUint32());
+                console.log(response);
                 controller.enqueue(response); // Send the response through the stream
                 controller.close(); // Close the stream
             }
@@ -76,8 +76,11 @@ function random(bytes = 1, random = false) {
     });
 }
 
+function matrixCreator(matrix) {
+    let matrixFile = Bun.file('matrix.bin');
+}
+
 export default {
     go,
-    giveFeedback,
-    random
+    giveFeedback
 };
